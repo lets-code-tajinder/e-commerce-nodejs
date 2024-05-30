@@ -5,7 +5,7 @@ const addToCart = async (req: Request, res: Response): Promise<void> => {
   try {
     const { userId, productId, qty } = req.body;
     if (!userId || !productId || !qty) {
-      res.status(400).json({ data: "Required fields are missing" });
+      res.status(400).json({ error: "Required fields are missing" });
       return;
     }
 
@@ -82,7 +82,7 @@ const getCartData = async (req: Request, res: Response): Promise<void> => {
     if (data.length > 0) {
       res.json({ myData: data });
     } else {
-      res.status(404).json({ msg: "No Results Found" });
+      res.status(404).json({ error: "No Results Found" });
     }
   } catch (error) {
     console.error("Error fetching data:", error);

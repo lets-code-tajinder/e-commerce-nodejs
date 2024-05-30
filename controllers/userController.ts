@@ -17,7 +17,7 @@ const addUser = async (req: Request, res: Response): Promise<void> => {
     res.status(200).send(newUser);
     return;
   } catch (error) {
-    res.status(500).send({ message: "Error creating user", error });
+    res.status(500).send({ error: error.message || "Error creating user" });
   }
 };
 
@@ -27,13 +27,13 @@ const login = async (req: Request, res: Response): Promise<void> => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      res.status(401).json({ message: "Invalid username or password" });
+      res.status(401).json({ error: "Invalid username or password" });
       return;
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      res.status(401).json({ message: "Invalid username or password" });
+      res.status(401).json({ error: "Invalid username or password" });
       return;
     }
 
@@ -45,9 +45,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({ msg: "Login successful", data, token });
   } catch (error) {
     console.error("Error logging in user:", error);
-    res
-      .status(500)
-      .json({ message: "Error logging in user", error: error.message });
+    res.status(500).json({ error: error.message || "Error logging in user" });
   }
 };
 
