@@ -10,6 +10,7 @@ const addToCart = async (req: Request, res: Response): Promise<void> => {
     }
 
     const cartItem = new Cart({ userId, productId, qty });
+
     await cartItem.save();
     res.json({ data: "Your data added successfully" });
   } catch (error) {
