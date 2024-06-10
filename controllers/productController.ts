@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Product from "../models/Product";
+import Product from "../models/product";
 import Category from "../models/Category";
 
 const getProducts = async (req: Request, res: Response): Promise<void> => {
@@ -14,7 +14,7 @@ const getProducts = async (req: Request, res: Response): Promise<void> => {
 
 const getProductData = async (req: Request, res: Response): Promise<void> => {
   try {
-    const allProducts = await Product.find().sort({ id: -1 });
+    const allProducts = await Product.find().sort({ categoryId: -1 });
     const specialProducts = await Product.find({ special: true });
     const newProducts = await Product.find({ new: true });
     const randomProducts = await Product.aggregate([{ $sample: { size: 5 } }]);
@@ -115,10 +115,56 @@ const searchProducts = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const addProduct = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const {
+      categoryId,
+      productName,
+      productDescription,
+      productPrice,
+      productImage,
+      displayOrder,
+      status,
+      productQuantity,
+      special,
+    } = req.body;
+
+    // Find the highest ID value in the database
+    const highestIdProduct = await Product.findOne(
+      {},
+      {},
+      { sort: { id: -1 } }
+    );
+
+    let lastProductId = highestIdProduct ? highestIdProduct.id + 1 : 1; // If there are no existing products, start with ID 1
+
+    const newProduct = new Product({
+      categoryId,
+      productName,
+      productDescription,
+      productPrice,
+      productImage,
+      displayOrder,
+      status,
+      productQuantity,
+      special,
+      id: lastProductId,
+    });
+
+    await newProduct.save();
+
+    res.json({ msg: "Product added successfully", data: newProduct });
+  } catch (error) {
+    console.error("Error adding product:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 export {
   getProducts,
   getProductData,
   getProductById,
   getProductsByCategoryId,
   searchProducts,
+  addProduct,
 };
